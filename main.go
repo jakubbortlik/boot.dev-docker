@@ -11,7 +11,11 @@ import (
 )
 
 func main() {
-	godotenv.Load()
+	err := godotenv.Load()
+	if err != nil {
+		log.Print(err)
+	}
+
 	m := http.NewServeMux()
 
 	m.HandleFunc("/", handlePage)
@@ -27,7 +31,7 @@ func main() {
 	// this blocks forever, until the server
 	// has an unrecoverable error
 	fmt.Printf("server started on http://localhost:%s\n", port)
-	err := srv.ListenAndServe()
+	err = srv.ListenAndServe()
 	log.Fatal(err)
 }
 
@@ -37,9 +41,12 @@ func handlePage(w http.ResponseWriter, r *http.Request) {
 	const page = `<html>
 <head></head>
 <body>
-	<p> Hello from Docker! I'm a Go server.</p>
+	<p> Hi Docker, I pushed a new version.</p>
 </body>
 </html>
 `
-	w.Write([]byte(page))
+	_, err := w.Write([]byte(page))
+	if err != nil {
+		log.Printf("failed to write response: %v", err)
+	}
 }
